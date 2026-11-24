@@ -1,0 +1,11 @@
+# Project-scoped Archon config
+# Inherits defaults from ~/.archon/config.yaml.
+# Reference: https://archon.diy/reference/configuration/
+
+worktree:
+  baseBranch: main
+
+git:
+  mode: fork
+  origin: https://github.com/atyeti-inc/Bank-of-Z
+  upstream: https://github.com/IBM/Bank-of-Z.git
