@@ -5,8 +5,14 @@
 - **Issue Tracking & Scope Boundaries**:
   - All planned tasks, epics, and work orders map to `atyeti-inc/Bank-of-Z`.
   - Refusals & Out-of-Scope: Issues must be solved narrowly. Opportunistic cleanup, unrelated refactoring, or collateral alterations beyond the explicit issue scope are strictly prohibited. Any out-of-scope defects, improvements, or recommendations discovered must be noted as follow-up new issues on origin (`atyeti-inc/Bank-of-Z`), never upstream.
+  - UI & Browser Automation Boundary: Strictly avoid UI emulation, browser automation, or frontend DOM clicking (e.g. issues requiring manual or headless browser tests). Focus strictly on backend transactional systems, copybooks, and resource definitions.
 
-## 2. Core Architectural Invariants & ADRs
+## 2. Qualified Problem Archetypes
+- **Archetype A: Computational Precision**: Eliminating floating-point (`COMP-2`) penny-drop truncation when mapping to fixed-point decimal (`PIC S9(10)V99`) using deterministic mathematical sweeps.
+- **Archetype B: Defensive Bounds Checking**: Enforcing string presence, length, and enumeration checks on COMMAREA buffers before Db2/CICS execution.
+- **Archetype C: Configuration & Resource Sync**: Atomic excision of obsolete CICS resource definitions (`bank-of-z-definitions.yaml`) and procedural I/O (`ABNDFILE`) validated against JSON schemas.
+
+## 3. Core Architectural Invariants & ADRs
 - **Architecture Pattern**: Hybrid Multi-Tier Mainframe Application (Service-Oriented Mainframe & API Gateway)
 - **Key Subsystems & Boundaries**:
   - `Frontend`: Single-page web UI using Carbon Web Components, Vanilla JS, HTML, and CSS served on Liberty port 9445/9081.
@@ -19,17 +25,19 @@
 - **Architectural Invariants / ADRs**:
   - Dual Backend Routing: Requests route to CICS or IMS core banking engines dynamically based on customer ID.
   - Keyring Certificate Re-Sign: Private key remains strictly within RACF keyring; certificates are re-signed with TLS Web Server Authentication EKU and SANs using the VSICA CA key.
+  - Identifier & Schema Immutability: Copybook variable names, DCLGEN host structures, record layouts, and byte offsets/lengths are frozen contracts. Never rename fields or perform cosmetic "typo fixes" unless explicitly specified by the issue work order.
+  - Mainframe Architecture Preservation: Reject blanket language rewrites. Preserve z/OS CICS, IMS, and Db2 semantics.
   - DCO Sign-off Invariant: All commits must include a Developer Certificate of Origin sign-off (`git commit -s`).
   - Detect-Secrets Invariant: Pre-commit scanning with `ibm/detect-secrets` against `.secrets.baseline` must pass without un-baselined secrets.
   - Build Invariants: z/OS native builds are governed by `dbb-app.yaml` and `zapp.yaml`.
 - **Linguistic / Stack Constraints**:
   - Target Environment: IBM z/OS Unix System Services (USS) with CICS TS, IMS, Db2, and z/OS Connect Liberty.
-  - Mainframe Languages: Fixed-format ANSI COBOL (columns 1-6 sequence, 7 indicator, 8-72 code), PL/I, BMS macros, and JCL conforming to DBB specifications.
+  - Mainframe Languages: Fixed-format ANSI COBOL (columns 1-6 sequence, 7 indicator, 8-11 Area A, 12-72 Area B, 73-80 blank/identification), PL/I, BMS macros, and JCL conforming to DBB specifications.
   - Java: Java 21 LTS for IMS JMP and MQ Java components managed via Gradle.
   - Node.js: Node.js 22.22.1+ for IDE setup scripts.
   - Python: Python 3 with Jinja2 and PyYAML for templating and setup automation.
 
-## 3. Toolchains & Operational Commands
+## 4. Toolchains & Operational Commands
 - **Runtimes & Package Managers**: z/OS USS, Java 21 LTS, Node.js 22+, Python 3, Gradle, pip, pre-commit
 - **Build / Codegen Prerequisite**:
   - `gradle -p src/api build`: Generates API artifacts from OpenAPI schema via z/OS Connect Gradle plugin

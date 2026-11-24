@@ -5,10 +5,10 @@
 - **PR Delivery Contract**:
   - Contribution Lifecycle:
     1. Yeti implements the issue on `origin:feature/<issue-name>`.
-    2. User reviews the Candidate PR in the fork (`atyeti-inc/Bank-of-Z`).
-    3. Rebase the feature branch onto `upstream:main`.
-    4. Submit `feature/<issue-name>` upstream to `IBM/Bank-of-Z`.
-  - Upstream Contribution Rules:
+    2. Autonomous runs open pull requests strictly against `origin:main` (`atyeti-inc/Bank-of-Z`).
+    3. User reviews and merges Candidate PRs in the fork (`atyeti-inc/Bank-of-Z`).
+    4. Upstream PR promotion to `IBM/Bank-of-Z` is an external, human-gated action. Yeti must NEVER push branches or submit pull requests directly to `upstream`.
+  - Upstream Promotion Rules (Human-gated):
     - Mandatory DCO: All commits must include `-s` (`Signed-off-by: Full Name <email>`). Unsigned commits are rejected by upstream checks.
     - Clean History: Rebase onto `upstream:main` before upstream PR submission; no merge bubbles or dirty commits.
   - Plan-vs-diff containment: Confine implementation strictly to the accepted issue scope. Opportunistic cleanup, unsolicited refactoring, or collateral modifications are strictly prohibited.
