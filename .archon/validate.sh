@@ -1,11 +1,12 @@
 #!/usr/bin/env bash
 set -euo pipefail
+export PYTHONDONTWRITEBYTECODE=1
 
 REPO_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 cd "$REPO_ROOT"
 
 TMP_DIR=$(mktemp -d -t boz-validate-XXXXXX)
-trap 'rm -rf "$TMP_DIR"' EXIT INT TERM
+trap 'rm -rf "$TMP_DIR"; find "$REPO_ROOT" -type d -name "__pycache__" -exec rm -rf {} + 2>/dev/null || true' EXIT INT TERM
 
 echo "================================================================"
 echo "Bank of Z Comprehensive Local Verification Suite (.archon)"
@@ -18,7 +19,7 @@ echo ""
 echo "=== STAGE 1: COBOL Layout & Syntax Audit ==="
 
 echo "--- 1.1: Running 80-column layout and copybook resolution audit ---"
-python3 .archon/scripts/check_cobol_layout.py
+python3 -B .archon/scripts/check_cobol_layout.py
 
 echo "--- 1.2: Running cobc syntax check on IMS COBOL modules ---"
 IMS_MODULES=(
@@ -38,7 +39,7 @@ for ims_mod in "${IMS_MODULES[@]}"; do
     base_name="$(basename "$ims_mod")"
     prep_target="$TMP_DIR/prep/$base_name"
     echo "Checking syntax: $ims_mod"
-    python3 .archon/scripts/cics_syntax_prep.py "$ims_mod" "$prep_target"
+    python3 -B .archon/scripts/cics_syntax_prep.py "$ims_mod" "$prep_target"
     cobc -fsyntax-only -std=ibm -I .archon/stubs/cpy -I src/base/cics/copy -I src/base/ims/copy "$prep_target"
 done
 
@@ -56,7 +57,7 @@ for cics_mod in "${CICS_MODULES[@]}"; do
     base_name="$(basename "$cics_mod")"
     prep_target="$TMP_DIR/prep/$base_name"
     echo "Preprocessing $cics_mod -> $prep_target"
-    python3 .archon/scripts/cics_syntax_prep.py "$cics_mod" "$prep_target"
+    python3 -B .archon/scripts/cics_syntax_prep.py "$cics_mod" "$prep_target"
     echo "Checking syntax: $prep_target"
     cobc -fsyntax-only -std=ibm -I .archon/stubs/cpy -I src/base/cics/copy -I src/base/ims/copy "$prep_target"
 done
@@ -87,7 +88,7 @@ echo "Stage 2 PASSED: Arithmetic precision and bounds assertions verified."
 # ==============================================================================
 echo ""
 echo "=== STAGE 3: Resource & Configuration Schema Validation ==="
-python3 .archon/scripts/validate_yaml.py
+python3 -B .archon/scripts/validate_yaml.py
 echo "Stage 3 PASSED: All YAML files and CICS resource definition schemas verified."
 
 # ==============================================================================
@@ -95,7 +96,7 @@ echo "Stage 3 PASSED: All YAML files and CICS resource definition schemas verifi
 # ==============================================================================
 echo ""
 echo "=== STAGE 4: Db2 Template Unit Testing ==="
-python3 -m unittest discover tests
+python3 -B -m unittest discover tests
 echo "Stage 4 PASSED: Native Db2 provisioning unit tests verified."
 
 # ==============================================================================
