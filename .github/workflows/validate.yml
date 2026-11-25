@@ -1,0 +1,26 @@
+name: validate
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+jobs:
+  validate:
+    name: Local Verification Suite (.archon)
+    runs-on: [self-hosted, gcp-ephemeral]
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Install dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y gnucobol python3-yaml python3-jsonschema python3-jinja2
+
+      - name: Run verification suite
+        run: bash .archon/validate.sh
