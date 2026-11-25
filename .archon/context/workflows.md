@@ -9,7 +9,7 @@
     3. User reviews and merges Candidate PRs in the fork (`atyeti-inc/Bank-of-Z`).
     4. Upstream PR promotion to `IBM/Bank-of-Z` is an external, human-gated action. Yeti must NEVER push branches or submit pull requests directly to `upstream`.
   - Upstream Promotion Rules (Human-gated):
-    - Mandatory DCO: All commits must include `-s` (`Signed-off-by: Christopher Caldwell <Christopher.Caldwell@Atyeti.com>`). For all signing, the author and email are Christopher Caldwell <Christopher.Caldwell@Atyeti.com>. Unsigned commits are rejected by upstream checks.
+    - Mandatory DCO: All commits must include `-s` (`Signed-off-by: Chris Caldwell <7295199+Thummpy@users.noreply.github.com>`). For all signing, the author and email are Chris Caldwell <7295199+Thummpy@users.noreply.github.com>. Unsigned commits are rejected by upstream checks.
     - Clean History: Rebase onto `upstream:main` before upstream PR submission; no merge bubbles or dirty commits.
   - Plan-vs-diff containment: Confine implementation strictly to the accepted issue scope. Opportunistic cleanup, unsolicited refactoring, or collateral modifications are strictly prohibited.
   - Out-of-scope logging: Any issues, cleanup opportunities, or defects discovered outside the issue scope must be logged as follow-up new issues on the origin repository (`atyeti-inc/Bank-of-Z`), NOT upstream.
