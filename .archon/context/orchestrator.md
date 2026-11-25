@@ -38,7 +38,16 @@
   - Python: Python 3 with Jinja2 and PyYAML for templating and setup automation.
 
 ## 4. Toolchains & Operational Commands
-- **Runtimes & Package Managers**: z/OS USS, Java 21 LTS, Node.js 22+, Python 3, Gradle, pip, pre-commit
+- **Runtimes & Package Managers**: z/OS USS, Java 21 LTS, Node.js 22+, Python 3 (Jinja2, PyYAML, jsonschema), GnuCOBOL 3.2+, Gradle, pip, pre-commit
+- **Local Verification Standard**:
+  - `bash .archon/validate.sh`: Single authoritative local verification suite executing 6 discrete stages:
+    - Stage 1: COBOL 80-column layout audit and GnuCOBOL syntax check (IMS modules and prepped CICS modules).
+    - Stage 2: Standalone COBOL test runners for Archetype A decimal precision and Archetype B bounds checking.
+    - Stage 3: Repository YAML syntax and CICS resource definition schema validation (`bank-of-z-definitions.yaml`).
+    - Stage 4: Db2 template unit testing (`python3 -m unittest discover tests`).
+    - Stage 5: Java & API builds via Gradle (gracefully skipped if Gradle is absent).
+    - Stage 6: Repository governance audit (working tree cleanliness and DCO sign-offs).
+  - Exit code contract: Exits 0 on success; non-zero immediately on any stage failure.
 - **Build / Codegen Prerequisite**:
   - `gradle -p src/api build`: Generates API artifacts from OpenAPI schema via z/OS Connect Gradle plugin
   - `gradle -p src/base/ims/java build`: Compiles and packages IMS Java JMP jar
