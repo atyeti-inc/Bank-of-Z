@@ -29,6 +29,7 @@
 
 ## 3. Verification & Test Harness Contract
 - **Test Runner & Verification**:
+  - `bash .archon/validate.sh`: Authoritative local verification command for dark-validate runs executing Stages 1-6.
   - `python3 -m unittest discover tests`: Local regression tests for Db2 provisioning and templating logic (requires Python 3 with `jinja2` and `pyyaml`).
   - `bash tests/run-all.sh`: Installation verification script running all test scripts in `tests/`.
   - `bash tests/test-setup.sh`: Setup script verification.
@@ -38,8 +39,9 @@
   - `detect-secrets scan --baseline .secrets.baseline`: Direct detect-secrets audit.
 - **Test Isolation & Sandbox Requirements**:
   - Local unit tests in `tests/test_db2_provisioning.py` are mock-based and do not execute z/OS commands or provision hardware.
+  - Intermediate files in `.archon/validate.sh` are generated in an ephemeral temporary directory (`mktemp -d`) cleaned up on script exit.
   - Live verification tests (`test_*.sh`) require active z/OS Connect and Liberty instances configured via `BASE_URL` and `FRONTEND_URL`.
-- **Pass Criteria**: Zero syntax errors, zero test regressions, clean git working tree, zero un-baselined secrets, and 100% DCO sign-offs.
+- **Pass Criteria**: Stages 1-4 and Stage 6 exit 0 in `.archon/validate.sh` (with Stage 5 gracefully deferred if Gradle is absent), clean git working tree, zero un-baselined secrets, and 100% DCO sign-offs.
 
 ## 4. Code Style & Design Invariants
 - **Typing Discipline**:
