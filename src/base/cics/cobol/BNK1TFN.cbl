@@ -69,7 +69,7 @@
 
        COPY DFHAID.
 
-       01 WS-AMOUNT-AS-FLOAT COMP-2.
+       01 WS-AMOUNT-DECIMAL            PIC S9(10)V99 VALUE ZERO.
 
        01 WS-NUM-COUNT-TOTAL            PIC S9(8) BINARY.
        01 WS-NUM-COUNT-POINT            PIC S9(8) BINARY.
@@ -491,7 +491,7 @@
       *
       * Provide the correct Amount
       *
-           MOVE WS-AMOUNT-AS-FLOAT TO SUBPGM-AMT.
+           MOVE WS-AMOUNT-DECIMAL TO SUBPGM-AMT.
 
            EXEC CICS LINK
               PROGRAM('XFRFUN')
@@ -1003,10 +1003,10 @@
       *
       *       Is it a positive amount?
       *
-              COMPUTE WS-AMOUNT-AS-FLOAT =
+              COMPUTE WS-AMOUNT-DECIMAL =
                  FUNCTION NUMVAL(AMTI(1:AMTL))
 
-              IF WS-AMOUNT-AS-FLOAT <= 0
+              IF WS-AMOUNT-DECIMAL <= 0
                  MOVE SPACES TO MESSAGEO
                  STRING 'Please supply a positive amount.'
                     DELIMITED BY SIZE,
@@ -1187,10 +1187,10 @@
               END-IF
            END-IF.
 
-           COMPUTE WS-AMOUNT-AS-FLOAT =
+           COMPUTE WS-AMOUNT-DECIMAL =
               FUNCTION NUMVAL(WS-AMOUNT-UNSTR(1:WS-AMOUNT-UNSTR-L)).
 
-           IF WS-AMOUNT-AS-FLOAT = ZERO
+           IF WS-AMOUNT-DECIMAL = ZERO
               MOVE SPACES TO MESSAGEO
               STRING 'Please supply a non-zero amount.'
                  DELIMITED BY SIZE,
