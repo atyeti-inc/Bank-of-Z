@@ -27,7 +27,7 @@
   - Keyring Certificate Re-Sign: Private key remains strictly within RACF keyring; certificates are re-signed with TLS Web Server Authentication EKU and SANs using the VSICA CA key.
   - Identifier & Schema Immutability: Copybook variable names, DCLGEN host structures, record layouts, and byte offsets/lengths are frozen contracts. Never rename fields or perform cosmetic "typo fixes" unless explicitly specified by the issue work order.
   - Mainframe Architecture Preservation: Reject blanket language rewrites. Preserve z/OS CICS, IMS, and Db2 semantics.
-  - DCO Sign-off Invariant: All commits must include a Developer Certificate of Origin sign-off (`git commit -s`). For all signing, the author and email are Christopher Caldwell <Christopher.Caldwell@Atyeti.com>.
+  - DCO Sign-off Invariant: All commits must include a Developer Certificate of Origin sign-off (`git commit -s`). For all signing, the author and email are Chris Caldwell <7295199+Thummpy@users.noreply.github.com>.
   - Detect-Secrets Invariant: Pre-commit scanning with `ibm/detect-secrets` against `.secrets.baseline` must pass without un-baselined secrets.
   - Build Invariants: z/OS native builds are governed by `dbb-app.yaml` and `zapp.yaml`.
 - **Linguistic / Stack Constraints**:
