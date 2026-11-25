@@ -4,7 +4,7 @@
        DATA DIVISION.
        WORKING-STORAGE SECTION.
        01  PASS-COUNT       PIC 99 VALUE 0.
-       01  TOTAL-COUNT      PIC 99 VALUE 12.
+       01  TOTAL-COUNT      PIC 99 VALUE 16.
        01  TEST-COMMAREA.
            COPY CRECUST.
 
@@ -148,8 +148,62 @@
                DISPLAY 'Assertion 12 FAILED: Invalid status rejected'
            END-IF
 
+      * Assertion 13: Empty address line 2 allowed (optional)
+           PERFORM INIT-VALID-PAYLOAD
+           MOVE SPACES TO COMM-ADDR-LINE2 OF COMM-ADDR
+           CALL 'CRECUST' USING TEST-COMMAREA
+           IF COMM-SUCCESS = 'Y'
+               ADD 1 TO PASS-COUNT
+               DISPLAY 'Assertion 13 passed: Empty addr line 2 allowed'
+           ELSE
+               DISPLAY 'Assertion 13 FAILED: Empty addr line 2 allowed'
+           END-IF
+
+      * Assertion 14: Valid populated address line 2 accepted
+           PERFORM INIT-VALID-PAYLOAD
+           MOVE 'SUITE 200' TO COMM-ADDR-LINE2 OF COMM-ADDR
+           CALL 'CRECUST' USING TEST-COMMAREA
+           IF COMM-SUCCESS = 'Y'
+               ADD 1 TO PASS-COUNT
+               DISPLAY
+                   'Assertion 14 passed: Valid populated addr line 2'
+           ELSE
+               DISPLAY
+                   'Assertion 14 FAILED: Valid populated addr line 2'
+           END-IF
+
+      * Assertion 15: Address line 2 boundary (50 chars) accepted
+           PERFORM INIT-VALID-PAYLOAD
+           MOVE
+           '12345678901234567890123456789012345678901234567890'
+               TO COMM-ADDR-LINE2 OF COMM-ADDR
+           CALL 'CRECUST' USING TEST-COMMAREA
+           IF COMM-SUCCESS = 'Y'
+               ADD 1 TO PASS-COUNT
+               DISPLAY
+                   'Assertion 15 passed: Max length addr line 2'
+           ELSE
+               DISPLAY
+                   'Assertion 15 FAILED: Max length addr line 2'
+           END-IF
+
+      * Assertion 16: Address line 2 input exceeding 50 chars bounded
+           PERFORM INIT-VALID-PAYLOAD
+           MOVE
+           '123456789012345678901234567890123456789012345678901'
+               TO COMM-ADDR-LINE2 OF COMM-ADDR
+           CALL 'CRECUST' USING TEST-COMMAREA
+           IF COMM-SUCCESS = 'Y'
+               ADD 1 TO PASS-COUNT
+               DISPLAY
+                   'Assertion 16 passed: Addr line 2 >50 chars'
+           ELSE
+               DISPLAY
+                   'Assertion 16 FAILED: Addr line 2 >50 chars'
+           END-IF
+
            DISPLAY 'CRECUST validation test completed: ' PASS-COUNT
-               ' / 12 customer boundary assertions passed (100%)'.
+               ' / 16 customer boundary assertions passed (100%)'.
 
            IF PASS-COUNT = TOTAL-COUNT
                MOVE 0 TO RETURN-CODE
