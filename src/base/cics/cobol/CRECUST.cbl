@@ -330,6 +330,8 @@
        01 STORM-DRAIN-CONDITION         PIC X(20).
 
        01 WS-DATE-OF-BIRTH-ERROR        PIC X         VALUE 'N'.
+       01 WS-VALIDATION-ERROR           PIC X         VALUE 'N'.
+       01 WS-FIELD-LEN                  PIC 999       VALUE 0.
        01 WS-DATE-OF-BIRTH-LILLIAN      PIC S9(9) BINARY.
 
        01 DATE-OF-BIRTH-FORMAT.
@@ -453,8 +455,14 @@
            IF WS-TITLE-VALID = 'N'
               MOVE 'N' TO COMM-SUCCESS
               MOVE 'T' TO COMM-FAIL-CODE
-              GOBACK
+              PERFORM GET-ME-OUT-OF-HERE
            END-IF
+
+           PERFORM VALIDATE-INPUT-DATA.
+
+           IF WS-VALIDATION-ERROR = 'Y'
+              PERFORM GET-ME-OUT-OF-HERE
+           END-IF.
 
            MOVE SORTCODE TO REQUIRED-SORT-CODE.
 
@@ -1468,6 +1476,7 @@
       *
            EXEC CICS RETURN
                 END-EXEC.
+           GOBACK.
 
        GMOFH999.
            EXIT.
@@ -1628,4 +1637,192 @@
                 END-EXEC.
 
        PTD2999.
+           EXIT.
+
+
+       VALIDATE-INPUT-DATA SECTION.
+       VID010.
+           MOVE 'N' TO WS-VALIDATION-ERROR.
+
+      *
+      *    Validate and default COMM-STATUS
+      *
+           IF COMM-STATUS = SPACES OR COMM-STATUS = LOW-VALUES
+              MOVE 'ACTIVE    ' TO COMM-STATUS
+           END-IF.
+
+           EVALUATE COMM-STATUS
+           WHEN 'ACTIVE    '
+           WHEN 'INACTIVE  '
+           WHEN 'SUSPENDED '
+                CONTINUE
+           WHEN OTHER
+                MOVE 'Y' TO WS-VALIDATION-ERROR
+                MOVE 'N' TO COMM-SUCCESS
+                MOVE 'V' TO COMM-FAIL-CODE
+                GO TO VID999
+           END-EVALUATE.
+
+      *
+      *    Validate COMM-FIRST-NAME: presence and length (1-50)
+      *
+           IF COMM-FIRST-NAME = SPACES OR
+              COMM-FIRST-NAME = LOW-VALUES
+              MOVE 'Y' TO WS-VALIDATION-ERROR
+              MOVE 'N' TO COMM-SUCCESS
+              MOVE 'V' TO COMM-FAIL-CODE
+              GO TO VID999
+           END-IF.
+
+           COMPUTE WS-FIELD-LEN =
+              FUNCTION LENGTH(FUNCTION TRIM(COMM-FIRST-NAME)).
+
+           IF WS-FIELD-LEN < 1 OR WS-FIELD-LEN > 50
+              MOVE 'Y' TO WS-VALIDATION-ERROR
+              MOVE 'N' TO COMM-SUCCESS
+              MOVE 'V' TO COMM-FAIL-CODE
+              GO TO VID999
+           END-IF.
+
+      *
+      *    Validate COMM-LAST-NAME: presence and length (1-50)
+      *
+           IF COMM-LAST-NAME = SPACES OR
+              COMM-LAST-NAME = LOW-VALUES
+              MOVE 'Y' TO WS-VALIDATION-ERROR
+              MOVE 'N' TO COMM-SUCCESS
+              MOVE 'V' TO COMM-FAIL-CODE
+              GO TO VID999
+           END-IF.
+
+           COMPUTE WS-FIELD-LEN =
+              FUNCTION LENGTH(FUNCTION TRIM(COMM-LAST-NAME)).
+
+           IF WS-FIELD-LEN < 1 OR WS-FIELD-LEN > 50
+              MOVE 'Y' TO WS-VALIDATION-ERROR
+              MOVE 'N' TO COMM-SUCCESS
+              MOVE 'V' TO COMM-FAIL-CODE
+              GO TO VID999
+           END-IF.
+
+      *
+      *    Validate COMM-ADDR-LINE1: presence and length (1-50)
+      *
+           IF COMM-ADDR-LINE1 OF COMM-ADDR = SPACES OR
+              COMM-ADDR-LINE1 OF COMM-ADDR = LOW-VALUES
+              MOVE 'Y' TO WS-VALIDATION-ERROR
+              MOVE 'N' TO COMM-SUCCESS
+              MOVE 'V' TO COMM-FAIL-CODE
+              GO TO VID999
+           END-IF.
+
+           COMPUTE WS-FIELD-LEN =
+              FUNCTION LENGTH(FUNCTION TRIM(COMM-ADDR-LINE1
+                 OF COMM-ADDR)).
+
+           IF WS-FIELD-LEN < 1 OR WS-FIELD-LEN > 50
+              MOVE 'Y' TO WS-VALIDATION-ERROR
+              MOVE 'N' TO COMM-SUCCESS
+              MOVE 'V' TO COMM-FAIL-CODE
+              GO TO VID999
+           END-IF.
+
+      *
+      *    Validate COMM-ADDR-LINE2: optional, length (1-50) if present
+      *
+           IF COMM-ADDR-LINE2 OF COMM-ADDR NOT = SPACES AND
+              COMM-ADDR-LINE2 OF COMM-ADDR NOT = LOW-VALUES
+              COMPUTE WS-FIELD-LEN =
+                 FUNCTION LENGTH(FUNCTION TRIM(COMM-ADDR-LINE2
+                    OF COMM-ADDR))
+              IF WS-FIELD-LEN < 1 OR WS-FIELD-LEN > 50
+                 MOVE 'Y' TO WS-VALIDATION-ERROR
+                 MOVE 'N' TO COMM-SUCCESS
+                 MOVE 'V' TO COMM-FAIL-CODE
+                 GO TO VID999
+              END-IF
+           END-IF.
+
+      *
+      *    Validate COMM-CITY: presence and length (1-50)
+      *
+           IF COMM-CITY OF COMM-ADDR = SPACES OR
+              COMM-CITY OF COMM-ADDR = LOW-VALUES
+              MOVE 'Y' TO WS-VALIDATION-ERROR
+              MOVE 'N' TO COMM-SUCCESS
+              MOVE 'V' TO COMM-FAIL-CODE
+              GO TO VID999
+           END-IF.
+
+           COMPUTE WS-FIELD-LEN =
+              FUNCTION LENGTH(FUNCTION TRIM(COMM-CITY
+                 OF COMM-ADDR)).
+
+           IF WS-FIELD-LEN < 1 OR WS-FIELD-LEN > 50
+              MOVE 'Y' TO WS-VALIDATION-ERROR
+              MOVE 'N' TO COMM-SUCCESS
+              MOVE 'V' TO COMM-FAIL-CODE
+              GO TO VID999
+           END-IF.
+
+      *
+      *    Validate COMM-POSTCODE: presence and length (1-10)
+      *
+           IF COMM-POSTCODE OF COMM-ADDR = SPACES OR
+              COMM-POSTCODE OF COMM-ADDR = LOW-VALUES
+              MOVE 'Y' TO WS-VALIDATION-ERROR
+              MOVE 'N' TO COMM-SUCCESS
+              MOVE 'V' TO COMM-FAIL-CODE
+              GO TO VID999
+           END-IF.
+
+           COMPUTE WS-FIELD-LEN =
+              FUNCTION LENGTH(FUNCTION TRIM(COMM-POSTCODE
+                 OF COMM-ADDR)).
+
+           IF WS-FIELD-LEN < 1 OR WS-FIELD-LEN > 10
+              MOVE 'Y' TO WS-VALIDATION-ERROR
+              MOVE 'N' TO COMM-SUCCESS
+              MOVE 'V' TO COMM-FAIL-CODE
+              GO TO VID999
+           END-IF.
+
+      *
+      *    Validate COMM-COUNTRY: presence and length (1-50)
+      *
+           IF COMM-COUNTRY OF COMM-ADDR = SPACES OR
+              COMM-COUNTRY OF COMM-ADDR = LOW-VALUES
+              MOVE 'Y' TO WS-VALIDATION-ERROR
+              MOVE 'N' TO COMM-SUCCESS
+              MOVE 'V' TO COMM-FAIL-CODE
+              GO TO VID999
+           END-IF.
+
+           COMPUTE WS-FIELD-LEN =
+              FUNCTION LENGTH(FUNCTION TRIM(COMM-COUNTRY
+                 OF COMM-ADDR)).
+
+           IF WS-FIELD-LEN < 1 OR WS-FIELD-LEN > 50
+              MOVE 'Y' TO WS-VALIDATION-ERROR
+              MOVE 'N' TO COMM-SUCCESS
+              MOVE 'V' TO COMM-FAIL-CODE
+              GO TO VID999
+           END-IF.
+
+      *
+      *    Validate COMM-PHONE: optional, length (1-20) if present
+      *
+           IF COMM-PHONE NOT = SPACES AND
+              COMM-PHONE NOT = LOW-VALUES
+              COMPUTE WS-FIELD-LEN =
+                 FUNCTION LENGTH(FUNCTION TRIM(COMM-PHONE))
+              IF WS-FIELD-LEN < 1 OR WS-FIELD-LEN > 20
+                 MOVE 'Y' TO WS-VALIDATION-ERROR
+                 MOVE 'N' TO COMM-SUCCESS
+                 MOVE 'V' TO COMM-FAIL-CODE
+                 GO TO VID999
+              END-IF
+           END-IF.
+
+       VID999.
            EXIT.

@@ -81,7 +81,16 @@ cobc -x -std=ibm -o "$TMP_DIR/bin/test_bounds_validation" .archon/tests/cobol/te
 echo "Executing test_bounds_validation..."
 "$TMP_DIR/bin/test_bounds_validation"
 
-echo "Stage 2 PASSED: Arithmetic precision and bounds assertions verified."
+echo "Compiling CRECUST object for integration testing..."
+cobc -c -std=ibm -I .archon/stubs/cpy -I src/base/cics/copy -I src/base/ims/copy -o "$TMP_DIR/bin/crecust.o" "$TMP_DIR/prep/CRECUST.cbl"
+
+echo "Compiling test_crecust_validation..."
+cobc -x -std=ibm -I .archon/stubs/cpy -I src/base/cics/copy -I src/base/ims/copy -o "$TMP_DIR/bin/test_crecust_validation" .archon/tests/cobol/test_crecust_validation.cbl "$TMP_DIR/bin/crecust.o"
+
+echo "Executing test_crecust_validation..."
+"$TMP_DIR/bin/test_crecust_validation"
+
+echo "Stage 2 PASSED: Arithmetic precision, bounds, and CRECUST validation verified."
 
 # ==============================================================================
 # STAGE 3: Resource & Configuration Schema Validation
