@@ -69,7 +69,7 @@
 
        01 AMTI9                        PIC 9(12).
 
-       01 WS-AMOUNT-AS-FLOAT COMP-2.
+       01 WS-AMOUNT-DECIMAL            PIC S9(10)V99 VALUE ZERO.
        01 WS-NUM-COUNT-TOTAL           PIC S9(8) BINARY.
        01 WS-NUM-COUNT-POINT           PIC S9(8) BINARY.
        01 WS-NUM-COUNT-SPACE           PIC S9(8) BINARY.
@@ -492,10 +492,10 @@
       *    Provide the correct Amount
       *
            IF SIGNI = '-'
-              COMPUTE WS-AMOUNT-AS-FLOAT = WS-AMOUNT-AS-FLOAT * -1
+              COMPUTE WS-AMOUNT-DECIMAL = WS-AMOUNT-DECIMAL * -1
            END-IF.
 
-           MOVE WS-AMOUNT-AS-FLOAT TO SUBPGM-AMT.
+           MOVE WS-AMOUNT-DECIMAL TO SUBPGM-AMT.
 
       *
       *    Get the ORIGIN data
@@ -962,7 +962,7 @@
        VALIDATE-AMOUNT SECTION.
        VA010.
 
-           MOVE 0 TO WS-AMOUNT-AS-FLOAT.
+           MOVE 0 TO WS-AMOUNT-DECIMAL.
 
            IF AMTL = ZERO
               MOVE 'The Amount entered must be numeric.' TO
@@ -974,7 +974,7 @@
 
 
            IF AMTI(1:AMTL) IS NUMERIC
-              COMPUTE WS-AMOUNT-AS-FLOAT =
+              COMPUTE WS-AMOUNT-DECIMAL =
                  FUNCTION NUMVAL(AMTI(1:AMTL))
 
               MOVE 'Y' TO VALID-DATA-SW
@@ -1130,10 +1130,10 @@
               END-IF
            END-IF.
 
-           COMPUTE WS-AMOUNT-AS-FLOAT =
+           COMPUTE WS-AMOUNT-DECIMAL =
               FUNCTION NUMVAL(WS-AMOUNT-UNSTR(1:WS-AMOUNT-UNSTR-L)).
 
-           IF WS-AMOUNT-AS-FLOAT = ZERO
+           IF WS-AMOUNT-DECIMAL = ZERO
               MOVE SPACES TO MESSAGEO
               STRING
                  'Please supply a non-zero amount.'
