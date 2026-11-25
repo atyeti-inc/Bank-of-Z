@@ -37,6 +37,14 @@ def preprocess_cics(src_path, dst_path):
 
         if not in_exec:
             stripped = raw[7:] if len(raw) > 7 else ''
+            # Check for compiler directives (PROCESS, CBL) and convert to comment line
+            first_word = stripped.strip().split()[0].upper() if stripped.strip() else ''
+            if not is_comment and first_word in ('PROCESS', 'CBL'):
+                prefix = raw[:6].ljust(6)
+                suffix = raw[7:] if len(raw) > 7 else ''
+                out.append(prefix + '*' + suffix + '\n')
+                continue
+
             # Check for EXEC statement not inside quotes or comments
             idx_exec = -1
             for kw in ('EXEC CICS', 'EXEC SQL', 'EXEC\n', 'EXEC\t'):

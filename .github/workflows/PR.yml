@@ -23,6 +23,7 @@ jobs:
     setup:
         needs:
             - controller
+        if: vars.ZOS_HOST != ''
         uses: ./.github/workflows/Setup.yml
         secrets:
             githubAccessToken: ${{ secrets.GH_ACTIONS_PAT }}

@@ -33,9 +33,13 @@ IMS_MODULES=(
     "src/base/ims/cobol/LOADTSTA.cbl"
 )
 
+mkdir -p "$TMP_DIR/prep"
 for ims_mod in "${IMS_MODULES[@]}"; do
+    base_name="$(basename "$ims_mod")"
+    prep_target="$TMP_DIR/prep/$base_name"
     echo "Checking syntax: $ims_mod"
-    cobc -fsyntax-only -std=ibm -I .archon/stubs/cpy -I src/base/cics/copy -I src/base/ims/copy "$ims_mod"
+    python3 .archon/scripts/cics_syntax_prep.py "$ims_mod" "$prep_target"
+    cobc -fsyntax-only -std=ibm -I .archon/stubs/cpy -I src/base/cics/copy -I src/base/ims/copy "$prep_target"
 done
 
 echo "--- 1.3: Preprocessing and checking CICS COBOL modules ---"
