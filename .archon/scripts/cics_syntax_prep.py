@@ -98,7 +98,12 @@ def _handle_exec_block(exec_lines, in_proc_div, out):
             else:
                 out.append('      * ' + (el[7:] if len(el) > 7 else el) + '\n')
     else:
-        if has_dot:
+        if 'FETCH ANY' in full_block.upper():
+            if has_dot:
+                out.append("           MOVE 'Y' TO WS-FINISHED-FETCHING.\n")
+            else:
+                out.append("           MOVE 'Y' TO WS-FINISHED-FETCHING\n")
+        elif has_dot:
             out.append('           CONTINUE.\n')
         else:
             out.append('           CONTINUE\n')
