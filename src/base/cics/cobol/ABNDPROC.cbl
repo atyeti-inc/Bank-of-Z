@@ -8,9 +8,8 @@
 
 
       ******************************************************************
-      * This program processes application abends and writes them to
-      * a centralised CF (KSDS) datastore - this is so that they can be
-      * viewed from one place, without having to go hunting for them.
+      * This program processes and logs application abends for
+      * diagnostic analysis.
       ******************************************************************
 
        IDENTIFICATION DIVISION.
@@ -29,15 +28,8 @@
        DATA DIVISION.
        WORKING-STORAGE SECTION.
 
-       01 WS-CICS-WORK-AREA.
-          05 WS-CICS-RESP      PIC S9(8) COMP.
-          05 WS-CICS-RESP2     PIC S9(8) COMP.
-
-
        01 WS-ABND-AREA.
            COPY ABNDINFO.
-
-       01 WS-ABND-KEY-LEN      PIC S9(8) COMP VALUE +12.
 
        LOCAL-STORAGE SECTION.
 
@@ -138,26 +130,6 @@
 
            MOVE DFHCOMMAREA TO WS-ABND-AREA.
 
-           EXEC CICS WRITE
-              FILE('ABNDFILE')
-              FROM(WS-ABND-AREA)
-              RIDFLD(ABND-VSAM-KEY)
-              RESP(WS-CICS-RESP)
-              RESP2(WS-CICS-RESP2)
-           END-EXEC.
-
-           IF WS-CICS-RESP NOT= DFHRESP(NORMAL)
-              DISPLAY '*********************************************'
-              DISPLAY '**** Unable to write to the file ABNDFILE !!!'
-              DISPLAY 'RESP=' WS-CICS-RESP ' RESP2=' WS-CICS-RESP2
-              DISPLAY '*********************************************'
-
-              EXEC CICS RETURN
-              END-EXEC
-
-           END-IF.
-
-      D    DISPLAY 'ABEND record successfully written to ABNDFILE'.
       D    DISPLAY WS-ABND-AREA.
 
            PERFORM GET-ME-OUT-OF-HERE.
